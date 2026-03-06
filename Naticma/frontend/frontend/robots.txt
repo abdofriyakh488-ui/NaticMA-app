@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://naticma.vercel.app/sitemap.xml
+Crawl-delay: 1

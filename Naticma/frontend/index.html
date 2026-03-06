@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NaticMA - كراء وشراء النطاقات</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#080c14; --surface:#0e1420; --surface2:#141c2e;
+    --accent:#00e5ff; --accent2:#7c3aed; --accent3:#10b981;
+    --text:#e2e8f0; --muted:#64748b; --border:rgba(0,229,255,0.12);
+    --glow:0 0 30px rgba(0,229,255,0.15); --red:#ef4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0}
+  .orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.15;pointer-events:none;z-index:0;animation:drift 20s ease-in-out infinite}
+  .orb1{width:500px;height:500px;background:var(--accent2);top:-200px;right:-100px}
+  .orb2{width:400px;height:400px;background:var(--accent);bottom:-100px;left:-100px;animation-delay:-10s}
+  @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,30px) scale(0.95)}}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(8,12,20,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+  .logo{font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--accent);text-shadow:0 0 20px rgba(0,229,255,.5);cursor:pointer}
+  .logo span{color:var(--accent2)}
+  nav ul{display:flex;gap:2rem;list-style:none}
+  nav ul a{color:var(--muted);text-decoration:none;font-size:.95rem;font-weight:600;transition:color .2s}
+  nav ul a:hover{color:var(--accent)}
+  .nav-btns{display:flex;gap:.75rem;align-items:center}
+  .btn-ghost{padding:.5rem 1.25rem;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);cursor:pointer;font-family:'Cairo',sans-serif;font-weight:600;font-size:.9rem;transition:all .2s}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+  .btn-primary{padding:.5rem 1.5rem;border:none;border-radius:8px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;cursor:pointer;font-family:'Cairo',sans-serif;font-weight:700;font-size:.9rem;transition:all .2s;box-shadow:0 4px 15px rgba(124,58,237,.3)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 25px rgba(0,229,255,.3)}
+  #user-info{display:none;align-items:center;gap:.75rem}
+  #user-name{font-size:.9rem;color:var(--accent);font-weight:600}
+
+  /* PAGES */
+  .page{display:none;position:relative;z-index:1}
+  .page.active{display:block}
+
+  /* HERO */
+  .hero{text-align:center;padding:6rem 2rem 4rem}
+  .hero-badge{display:inline-block;padding:.4rem 1.2rem;border:1px solid rgba(0,229,255,.3);border-radius:100px;font-size:.8rem;color:var(--accent);margin-bottom:1.5rem;background:rgba(0,229,255,.05);font-family:'Space Mono',monospace}
+  .hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;line-height:1.1;margin-bottom:1.5rem}
+  .hero h1 .grad{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .hero p{font-size:1.15rem;color:var(--muted);max-width:520px;margin:0 auto 2.5rem;line-height:1.8}
+
+  /* SEARCH */
+  .search-box{display:flex;max-width:680px;margin:0 auto 1.5rem;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;background:var(--surface);box-shadow:var(--glow);transition:border-color .3s,box-shadow .3s}
+  .search-box:focus-within{border-color:var(--accent);box-shadow:0 0 40px rgba(0,229,255,.2)}
+  .search-box input{flex:1;padding:1.1rem 1.5rem;background:transparent;border:none;outline:none;font-size:1rem;color:var(--text);font-family:'Cairo',sans-serif;text-align:right}
+  .search-box input::placeholder{color:var(--muted)}
+  .tld-select{padding:0 1.2rem;background:var(--surface2);border:none;border-right:1px solid var(--border);color:var(--accent);font-family:'Space Mono',monospace;font-size:.9rem;cursor:pointer;outline:none}
+  .tld-select option{background:var(--bg)}
+  .search-btn{padding:1.1rem 2rem;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;color:#fff;font-family:'Cairo',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:opacity .2s;white-space:nowrap}
+  .search-btn:hover{opacity:.9}
+  .search-btn:disabled{opacity:.5;cursor:not-allowed}
+  .popular-tlds{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap}
+  .tld-chip{padding:.3rem .8rem;border:1px solid var(--border);border-radius:100px;font-size:.8rem;color:var(--muted);cursor:pointer;font-family:'Space Mono',monospace;transition:all .2s;background:transparent}
+  .tld-chip:hover{color:var(--accent);border-color:var(--accent);background:rgba(0,229,255,.05)}
+
+  /* RESULTS */
+  #search-results{max-width:720px;margin:2rem auto;padding:0 2rem;display:none}
+  .result-item{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:.75rem;transition:all .2s}
+  .result-item:hover{border-color:rgba(0,229,255,.3);background:var(--surface2)}
+  .result-item.available{border-right:3px solid var(--accent3)}
+  .result-item.taken{border-right:3px solid var(--red);opacity:.6}
+  .result-domain{font-family:'Space Mono',monospace;font-size:1rem}
+  .result-status{font-size:.75rem;font-weight:600;margin-top:.2rem}
+  .status-available{color:var(--accent3)}
+  .status-taken{color:var(--red)}
+  .result-actions{display:flex;gap:.5rem;align-items:center}
+  .result-price{font-family:'Space Mono',monospace;font-size:.9rem;color:var(--accent);margin-left:.75rem}
+  .btn-sm{padding:.4rem 1rem;border-radius:7px;font-family:'Cairo',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+  .btn-buy{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff}
+  .btn-rent{background:var(--surface2);color:var(--accent);border:1px solid var(--border)}
+  .btn-buy:hover,.btn-rent:hover{transform:translateY(-1px)}
+
+  /* STATS */
+  .stats{display:flex;justify-content:center;gap:3rem;padding:3rem 2rem}
+  .stat{text-align:center}
+  .stat-num{font-size:2.2rem;font-weight:900;font-family:'Space Mono',monospace;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .stat-label{font-size:.85rem;color:var(--muted);margin-top:.25rem}
+
+  /* SECTIONS */
+  section{position:relative;z-index:1;padding:4rem 3rem;max-width:1200px;margin:0 auto}
+  .section-label{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:.75rem}
+  .section-title{font-size:2rem;font-weight:900;margin-bottom:.75rem}
+  .section-sub{color:var(--muted);font-size:.95rem;margin-bottom:3rem;line-height:1.8}
+
+  /* PRICING */
+  .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
+  .pricing-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;position:relative;overflow:hidden;transition:all .3s}
+  .pricing-card:hover{border-color:rgba(0,229,255,.3);transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+  .pricing-card.featured{border-color:var(--accent);background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(124,58,237,.05))}
+  .pricing-card.featured::before{content:'★ الأكثر طلباً';position:absolute;top:1.25rem;left:1.25rem;font-size:.7rem;font-weight:700;color:var(--accent);background:rgba(0,229,255,.1);padding:.25rem .75rem;border-radius:100px;border:1px solid rgba(0,229,255,.3)}
+  .tld-name{font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:.5rem}
+  .tld-desc{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+  .price-row{display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
+  .price-row:last-of-type{border-bottom:none}
+  .price-label{color:var(--muted)}
+  .price-val{font-family:'Space Mono',monospace;font-weight:700;color:var(--text)}
+  .price-val.rent{color:var(--accent3)}
+  .price-val.buy{color:var(--accent)}
+  .card-btn{width:100%;margin-top:1.5rem;padding:.8rem;border-radius:10px;border:none;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;font-family:'Cairo',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .2s}
+  .card-btn:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,229,255,.2)}
+
+  /* FEATURES */
+  .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem}
+  .feature-card{padding:1.75rem;background:var(--surface);border:1px solid var(--border);border-radius:16px;transition:all .3s}
+  .feature-card:hover{border-color:rgba(0,229,255,.25);background:var(--surface2)}
+  .feature-icon{font-size:2rem;margin-bottom:1rem;display:block}
+  .feature-card h3{font-size:1rem;font-weight:700;margin-bottom:.5rem}
+  .feature-card p{font-size:.85rem;color:var(--muted);line-height:1.7}
+
+  /* DIVIDER */
+  hr.divider{border:none;border-top:1px solid var(--border);max-width:1200px;margin:0 auto}
+
+  /* MODAL OVERLAY */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:1000;align-items:center;justify-content:center}
+  .modal-overlay.show{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2.5rem;max-width:480px;width:90%;position:relative;animation:fadeDown .3s ease;max-height:90vh;overflow-y:auto}
+  @keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+  .modal-close{position:absolute;top:1rem;left:1rem;width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+  .modal h2{font-size:1.4rem;font-weight:900;margin-bottom:.5rem}
+  .modal-domain{font-family:'Space Mono',monospace;color:var(--accent);font-size:1rem;margin-bottom:1.25rem}
+  .option-tabs{display:flex;gap:.5rem;margin-bottom:1.25rem}
+  .option-tab{flex:1;padding:.65rem;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Cairo',sans-serif;font-weight:600;font-size:.9rem;cursor:pointer;text-align:center;transition:all .2s}
+  .option-tab.active{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border-color:transparent}
+  .form-group{margin-bottom:1.1rem}
+  .form-group label{display:block;font-size:.85rem;font-weight:600;color:var(--muted);margin-bottom:.4rem}
+  .form-group input,.form-group select{width:100%;padding:.75rem 1rem;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Cairo',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s}
+  .form-group input:focus,.form-group select:focus{border-color:var(--accent)}
+  .price-summary{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:center}
+  .price-summary .label{font-size:.85rem;color:var(--muted)}
+  .price-summary .amount{font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--accent)}
+  .ls-secure{font-size:.78rem;color:var(--muted);text-align:center;margin-top:.75rem;display:flex;align-items:center;justify-content:center;gap:.4rem}
+  .ls-logo{display:inline-flex;align-items:center;gap:.3rem;color:var(--accent3);font-weight:700}
+  #card-error{color:var(--red);font-size:.82rem;margin-bottom:.75rem;display:none}
+  .pay-btn{width:100%;padding:.9rem;border-radius:10px;border:none;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;font-family:'Cairo',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+  .pay-btn:disabled{opacity:.6;cursor:not-allowed}
+  .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* AUTH MODAL */
+  #auth-modal .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.5rem}
+  #auth-modal .tab{flex:1;padding:.75rem;text-align:center;cursor:pointer;font-weight:600;font-size:.9rem;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s}
+  #auth-modal .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+  .auth-error{color:var(--red);font-size:.82rem;margin-bottom:.75rem;display:none;padding:.5rem .75rem;background:rgba(239,68,68,.1);border-radius:8px;border:1px solid rgba(239,68,68,.3)}
+
+  /* DASHBOARD */
+  #dashboard-page{padding:3rem}
+  .dashboard-header{margin-bottom:2rem}
+  .dashboard-header h2{font-size:1.75rem;font-weight:900}
+  .dashboard-header p{color:var(--muted);margin-top:.25rem}
+  .orders-grid{display:grid;gap:1rem}
+  .order-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
+  .order-domain{font-family:'Space Mono',monospace;font-size:1rem;color:var(--accent)}
+  .order-meta{font-size:.82rem;color:var(--muted);margin-top:.2rem}
+  .order-badge{padding:.25rem .75rem;border-radius:100px;font-size:.75rem;font-weight:700}
+  .badge-active{background:rgba(16,185,129,.1);color:var(--accent3);border:1px solid rgba(16,185,129,.3)}
+  .badge-pending{background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.3)}
+  .badge-failed{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+  .empty-state{text-align:center;padding:4rem 2rem;color:var(--muted)}
+  .empty-state .icon{font-size:3rem;margin-bottom:1rem}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:2rem;right:2rem;padding:1rem 1.5rem;border-radius:12px;font-size:.9rem;font-weight:600;z-index:9999;transform:translateY(100px);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+  .toast.success{background:var(--surface);border:1px solid var(--accent3);color:var(--accent3)}
+  .toast.error{background:var(--surface);border:1px solid var(--red);color:var(--red)}
+  .toast.show{transform:translateY(0);opacity:1}
+
+  /* LOADING */
+  .loading{text-align:center;padding:2rem;color:var(--muted);font-size:.9rem}
+
+  footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2.5rem 3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+  footer p{color:var(--muted);font-size:.85rem}
+  footer a{color:var(--muted);text-decoration:none;font-size:.85rem;transition:color .2s}
+  footer a:hover{color:var(--accent)}
+
+  @media(max-width:768px){
+    nav{padding:1rem}
+    nav ul{display:none}
+    .hero{padding:4rem 1.5rem 2rem}
+    .stats{gap:1.5rem;flex-wrap:wrap}
+    section{padding:3rem 1.5rem}
+    footer{flex-direction:column;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════ AUTH MODAL ═══════════════════════ -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="closeAuthModal()">✕</button>
+    <div class="tabs">
+      <div class="tab active" onclick="switchAuthTab('login')">تسجيل الدخول</div>
+      <div class="tab" onclick="switchAuthTab('register')">إنشاء حساب</div>
+    </div>
+
+    <div id="login-form">
+      <div class="auth-error" id="login-error"></div>
+      <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="login-email" placeholder="example@email.com"></div>
+      <div class="form-group"><label>كلمة المرور</label><input type="password" id="login-password" placeholder="••••••••"></div>
+      <button class="pay-btn" onclick="doLogin()"><span id="login-spinner" class="spinner"></span>دخول</button>
+    </div>
+
+    <div id="register-form" style="display:none">
+      <div class="auth-error" id="register-error"></div>
+      <div class="form-group"><label>الاسم الكامل</label><input type="text" id="reg-name" placeholder="محمد أحمد"></div>
+      <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="reg-email" placeholder="example@email.com"></div>
+      <div class="form-group"><label>كلمة المرور</label><input type="password" id="reg-password" placeholder="8 أحرف على الأقل"></div>
+      <button class="pay-btn" onclick="doRegister()"><span id="reg-spinner" class="spinner"></span>إنشاء الحساب</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ORDER MODAL ═══════════════════════ -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeOrderModal()">✕</button>
+    <h2>أكمل طلبك</h2>
+    <div class="modal-domain" id="order-domain-label"></div>
+
+    <div class="option-tabs">
+      <div class="option-tab active" id="tab-buy" onclick="setOrderMode('buy')">🛒 شراء</div>
+      <div class="option-tab" id="tab-rent" onclick="setOrderMode('rent')">📅 كراء</div>
+    </div>
+
+    <div id="rent-opts" style="display:none">
+      <div class="form-group">
+        <label>مدة الكراء</label>
+        <select id="rent-duration" onchange="updateOrderPrice()">
+          <option value="1m">شهر واحد</option>
+          <option value="3m">3 أشهر</option>
+          <option value="6m">6 أشهر</option>
+          <option value="1y">سنة كاملة</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="price-summary">
+      <span class="label">المجموع</span>
+      <span class="amount" id="order-price-label">$0.00</span>
+    </div>
+
+    <!-- LS payment info box -->
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;text-align:center">
+      <div style="font-size:.85rem;color:var(--muted);margin-bottom:.5rem">ستُوجَّه إلى صفحة دفع آمنة تقبل:</div>
+      <div style="display:flex;justify-content:center;gap:1rem;font-size:.9rem;font-weight:700">
+        <span>💳 Visa</span>
+        <span>💳 Mastercard</span>
+        <span>🅿️ PayPal</span>
+      </div>
+    </div>
+
+    <button class="pay-btn" id="pay-btn" onclick="submitPayment()">
+      <span id="pay-spinner" class="spinner"></span>
+      <span id="pay-label">💳 انتقل للدفع</span>
+    </button>
+    <p class="ls-secure">🔒 الدفع مؤمّن عبر <span class="ls-logo">🍋 Lemon Squeezy</span></p>
+  </div>
+</div>
+
+<!-- ═══════════════════════ NAV ═══════════════════════ -->
+<nav>
+  <div class="logo" onclick="showPage('home')">Domain<span>AR</span></div>
+  <ul>
+    <li><a href="#" onclick="showPage('home');scrollToSection('pricing')">الأسعار</a></li>
+    <li><a href="#" onclick="showPage('home');scrollToSection('features')">المميزات</a></li>
+  </ul>
+  <div class="nav-btns">
+    <div id="auth-btns">
+      <button class="btn-ghost" onclick="openAuthModal('login')">تسجيل دخول</button>
+      <button class="btn-primary" onclick="openAuthModal('register')">إنشاء حساب</button>
+    </div>
+    <div id="user-info" style="display:none;align-items:center;gap:.75rem">
+      <span id="user-name" style="font-size:.9rem;color:var(--accent);font-weight:600"></span>
+      <button class="btn-ghost" onclick="showPage('dashboard')">طلباتي</button>
+      <button class="btn-ghost" onclick="doLogout()">خروج</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════ HOME PAGE ═══════════════════════ -->
+<div class="page active" id="home-page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">✦ أكثر من 500 امتداد متاح</div>
+    <h1>احجز <span class="grad">نطاقك الرقمي</span><br>بكل سهولة</h1>
+    <p>ابحث عن اسم نطاقك المثالي، اشتره أو استأجره بأسعار تنافسية. حماية كاملة، إدارة سهلة، دعم فوري.</p>
+
+    <div class="search-box">
+      <select class="tld-select" id="tldSelect">
+        <option>.com</option><option>.net</option><option>.org</option>
+        <option>.io</option><option>.co</option><option>.app</option>
+        <option>.ai</option><option>.ma</option><option>.dz</option><option>.tn</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="اكتب اسم نطاقك..." onkeydown="if(event.key==='Enter')searchDomain()">
+      <button class="search-btn" id="search-btn" onclick="searchDomain()">🔍 بحث</button>
+    </div>
+
+    <div class="popular-tlds">
+      <span style="font-size:.8rem;color:var(--muted);margin-left:.5rem">الأكثر طلباً:</span>
+      <button class="tld-chip" onclick="setTld('.com')">.com</button>
+      <button class="tld-chip" onclick="setTld('.io')">.io</button>
+      <button class="tld-chip" onclick="setTld('.ai')">.ai</button>
+      <button class="tld-chip" onclick="setTld('.ma')">.ma</button>
+      <button class="tld-chip" onclick="setTld('.net')">.net</button>
+    </div>
+  </div>
+
+  <!-- SEARCH RESULTS -->
+  <div id="search-results"></div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="c1">125,000+</div><div class="stat-label">نطاق مسجل</div></div>
+    <div class="stat"><div class="stat-num" id="c2">48,000+</div><div class="stat-label">عميل سعيد</div></div>
+    <div class="stat"><div class="stat-num">500+</div><div class="stat-label">امتداد متاح</div></div>
+    <div class="stat"><div class="stat-num">99.9%</div><div class="stat-label">وقت التشغيل</div></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="section-label">— الأسعار</div>
+    <div class="section-title">اختر النطاق المناسب لك</div>
+    <div class="section-sub">شراء أو كراء — الخيار لك. أسعار شفافة بدون رسوم خفية.</div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="tld-name">.com</div>
+        <div class="tld-desc">الأكثر انتشاراً في العالم. مثالي للمواقع التجارية.</div>
+        <div class="price-row"><span class="price-label">شراء / سنة</span><span class="price-val buy">$12.99</span></div>
+        <div class="price-row"><span class="price-label">كراء / شهر</span><span class="price-val rent">$2.99</span></div>
+        <button class="card-btn" onclick="openOrderModal('example.com','.com',12.99,2.99,'buy')">احجز الآن</button>
+      </div>
+      <div class="pricing-card featured">
+        <div class="tld-name">.io</div>
+        <div class="tld-desc">المفضل للشركات التقنية والناشئة.</div>
+        <div class="price-row"><span class="price-label">شراء / سنة</span><span class="price-val buy">$39.99</span></div>
+        <div class="price-row"><span class="price-label">كراء / شهر</span><span class="price-val rent">$5.99</span></div>
+        <button class="card-btn" onclick="openOrderModal('example.io','.io',39.99,5.99,'buy')">احجز الآن</button>
+      </div>
+      <div class="pricing-card">
+        <div class="tld-name">.ai</div>
+        <div class="tld-desc">للمشاريع المتعلقة بالذكاء الاصطناعي.</div>
+        <div class="price-row"><span class="price-label">شراء / سنة</span><span class="price-val buy">$79.99</span></div>
+        <div class="price-row"><span class="price-label">كراء / شهر</span><span class="price-val rent">$9.99</span></div>
+        <button class="card-btn" onclick="openOrderModal('example.ai','.ai',79.99,9.99,'buy')">احجز الآن</button>
+      </div>
+      <div class="pricing-card">
+        <div class="tld-name">.ma</div>
+        <div class="tld-desc">النطاق الوطني للمغرب.</div>
+        <div class="price-row"><span class="price-label">شراء / سنة</span><span class="price-val buy">$18.99</span></div>
+        <div class="price-row"><span class="price-label">كراء / شهر</span><span class="price-val rent">$3.49</span></div>
+        <button class="card-btn" onclick="openOrderModal('example.ma','.ma',18.99,3.49,'buy')">احجز الآن</button>
+      </div>
+      <div class="pricing-card">
+        <div class="tld-name">.net</div>
+        <div class="tld-desc">بديل قوي وموثوق لـ .com.</div>
+        <div class="price-row"><span class="price-label">شراء / سنة</span><span class="price-val buy">$13.99</span></div>
+        <div class="price-row"><span class="price-label">كراء / شهر</span><span class="price-val rent">$2.99</span></div>
+        <button class="card-btn" onclick="openOrderModal('example.net','.net',13.99,2.99,'buy')">احجز الآن</button>
+      </div>
+      <div class="pricing-card">
+        <div class="tld-name">.org</div>
+        <div class="tld-desc">للمنظمات والجمعيات.</div>
+        <div class="price-row"><span class="price-label">شراء / سنة</span><span class="price-val buy">$11.99</span></div>
+        <div class="price-row"><span class="price-label">كراء / شهر</span><span class="price-val rent">$2.49</span></div>
+        <button class="card-btn" onclick="openOrderModal('example.org','.org',11.99,2.49,'buy')">احجز الآن</button>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-label">— المميزات</div>
+    <div class="section-title">لماذا تختار NaticMA؟</div>
+    <div class="features-grid">
+      <div class="feature-card"><span class="feature-icon">🔒</span><h3>حماية WHOIS مجانية</h3><p>نخفي بياناتك الشخصية تلقائياً لحماية خصوصيتك.</p></div>
+      <div class="feature-card"><span class="feature-icon">⚡</span><h3>تفعيل فوري</h3><p>نطاقك نشط خلال دقائق من إتمام الدفع.</p></div>
+      <div class="feature-card"><span class="feature-icon">🔍</span><h3>بحث حقيقي</h3><p>بحث مباشر عبر Namecheap API للتحقق الفعلي من توفر النطاق.</p></div>
+      <div class="feature-card"><span class="feature-icon">💳</span><h3>دفع آمن</h3><p>معالجة الدفع عبر Lemon Squeezy. يقبل Visa وMastercard وPayPal من كل العالم.</p></div>
+      <div class="feature-card"><span class="feature-icon">📅</span><h3>كراء شهري</h3><p>استأجر نطاقك شهرياً دون التزام طويل. مرونة تامة.</p></div>
+      <div class="feature-card"><span class="feature-icon">💬</span><h3>دعم 24/7</h3><p>فريق دعم بالعربية جاهز على مدار الساعة.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="logo" style="font-family:'Space Mono',monospace;color:var(--accent)">Domain<span style="color:var(--accent2)">AR</span></div>
+    <p>© 2024 NaticMA — جميع الحقوق محفوظة</p>
+    <div style="display:flex;gap:1.5rem">
+      <a href="#">سياسة الخصوصية</a>
+      <a href="#">الشروط والأحكام</a>
+      <a href="#">اتصل بنا</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════ DASHBOARD ═══════════════════════ -->
+<div class="page" id="dashboard-page">
+  <div id="dashboard-page-inner" style="max-width:900px;margin:0 auto;padding:3rem 2rem">
+    <div class="dashboard-header">
+      <h2>طلباتي</h2>
+      <p style="color:var(--muted);margin-top:.25rem">إدارة جميع نطاقاتك المشتراة والمستأجرة</p>
+    </div>
+    <div id="orders-container"><div class="loading">⏳ جاري تحميل الطلبات...</div></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// CONFIG — change this to your backend URL
+// ══════════════════════════════════════════════
+const API = 'https://naticma-backend.up.railway.app/api'; // ← رابط Railway الخاص بك
+let token = localStorage.getItem('token');
+let currentUser = null;
+
+// ── Init ──────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  if (token) restoreSession();
+  checkSuccessRedirect();
+});
+
+async function restoreSession() {
+  try {
+    const res = await apiFetch('/auth/me');
+    if (res.user) setUser(res.user);
+  } catch { doLogout(); }
+}
+
+// ── API helper ────────────────────────────────
+async function apiFetch(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(API + path, { ...opts, headers });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'حدث خطأ');
+  return data;
+}
+
+// ── Auth ──────────────────────────────────────
+function openAuthModal(tab) {
+  document.getElementById('auth-modal').classList.add('show');
+  switchAuthTab(tab);
+}
+function closeAuthModal() { document.getElementById('auth-modal').classList.remove('show'); }
+
+function switchAuthTab(tab) {
+  document.querySelectorAll('#auth-modal .tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('login-form').style.display = tab==='login' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab==='register' ? 'block' : 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  const spin = document.getElementById('login-spinner');
+  errEl.style.display = 'none';
+  spin.style.display = 'inline-block';
+  try {
+    const data = await apiFetch('/auth/login', { method:'POST', body: JSON.stringify({email,password}) });
+    token = data.token;
+    localStorage.setItem('token', token);
+    setUser(data.user);
+    closeAuthModal();
+    showToast('✅ مرحباً ' + data.user.name, 'success');
+  } catch(e) {
+    errEl.textContent = e.message; errEl.style.display = 'block';
+  } finally { spin.style.display = 'none'; }
+}
+
+async function doRegister() {
+  const name = document.getElementById('reg-name').value;
+  const email = document.getElementById('reg-email').value;
+  const password = document.getElementById('reg-password').value;
+  const errEl = document.getElementById('register-error');
+  const spin = document.getElementById('reg-spinner');
+  errEl.style.display = 'none';
+  spin.style.display = 'inline-block';
+  try {
+    const data = await apiFetch('/auth/register', { method:'POST', body: JSON.stringify({name,email,password}) });
+    token = data.token;
+    localStorage.setItem('token', token);
+    setUser(data.user);
+    closeAuthModal();
+    showToast('🎉 تم إنشاء حسابك بنجاح!', 'success');
+  } catch(e) {
+    errEl.textContent = e.message; errEl.style.display = 'block';
+  } finally { spin.style.display = 'none'; }
+}
+
+function setUser(user) {
+  currentUser = user;
+  document.getElementById('auth-btns').style.display = 'none';
+  document.getElementById('user-info').style.display = 'flex';
+  document.getElementById('user-name').textContent = user.name;
+}
+
+function doLogout() {
+  token = null; currentUser = null;
+  localStorage.removeItem('token');
+  document.getElementById('auth-btns').style.display = 'flex';
+  document.getElementById('user-info').style.display = 'none';
+  showPage('home');
+}
+
+// ── Pages ─────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(name+'-page').classList.add('active');
+  if (name === 'dashboard') loadOrders();
+  window.scrollTo(0,0);
+}
+
+function scrollToSection(id) {
+  setTimeout(() => document.getElementById(id)?.scrollIntoView({behavior:'smooth'}), 100);
+}
+
+// ── Domain Search ─────────────────────────────
+function setTld(tld) { document.getElementById('tldSelect').value = tld; }
+
+async function searchDomain() {
+  const query = document.getElementById('searchInput').value.trim();
+  if (!query) return;
+  const tld = document.getElementById('tldSelect').value;
+  const btn = document.getElementById('search-btn');
+  const resultsEl = document.getElementById('search-results');
+
+  btn.disabled = true; btn.textContent = '⏳ جاري البحث...';
+  resultsEl.style.display = 'block';
+  resultsEl.innerHTML = '<div class="loading">🔍 جاري البحث عن النطاقات...</div>';
+
+  try {
+    const data = await apiFetch(`/domains/search?query=${encodeURIComponent(query)}&tlds=${tld}`);
+    const html = data.domains.map(d => `
+      <div class="result-item ${d.available ? 'available' : 'taken'}">
+        <div>
+          <div class="result-domain">${d.domain}</div>
+          <div class="result-status ${d.available ? 'status-available' : 'status-taken'}">
+            ${d.available ? '✓ متاح' : '✗ غير متاح'}
+          </div>
+        </div>
+        <div class="result-actions">
+          ${d.available ? `
+            <span class="result-price">$${d.buyPrice}/سنة</span>
+            <button class="btn-sm btn-buy" onclick="openOrderModal('${d.domain}','${d.tld}',${d.buyPrice},${d.rentPrice},'buy')">شراء</button>
+            <button class="btn-sm btn-rent" onclick="openOrderModal('${d.domain}','${d.tld}',${d.buyPrice},${d.rentPrice},'rent')">كراء</button>
+          ` : '<span style="color:var(--red);font-size:.85rem">محجوز</span>'}
+        </div>
+      </div>
+    `).join('');
+    resultsEl.innerHTML = html;
+    resultsEl.scrollIntoView({behavior:'smooth',block:'start'});
+  } catch(e) {
+    resultsEl.innerHTML = `<div style="color:var(--red);text-align:center;padding:1rem">${e.message}</div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = '🔍 بحث';
+  }
+}
+
+// ── Order Modal ───────────────────────────────
+function openOrderModal(domain, tld, buyPrice, rentPrice, defaultMode) {
+  if (!currentUser) { openAuthModal('login'); showToast('سجل دخولك أولاً لإتمام الطلب', 'error'); return; }
+  currentOrder = { domain, tld, buyPrice, rentPrice };
+  document.getElementById('order-domain-label').textContent = domain;
+  setOrderMode(defaultMode || 'buy');
+  document.getElementById('order-modal').classList.add('show');
+}
+
+function closeOrderModal() { document.getElementById('order-modal').classList.remove('show'); }
+
+function setOrderMode(mode) {
+  currentOrder.mode = mode;
+  document.getElementById('tab-buy').classList.toggle('active', mode==='buy');
+  document.getElementById('tab-rent').classList.toggle('active', mode==='rent');
+  document.getElementById('rent-opts').style.display = mode==='rent' ? 'block' : 'none';
+  updateOrderPrice();
+}
+
+const RENT_MONTHS = {'1m':1,'3m':3,'6m':6,'1y':12};
+function updateOrderPrice() {
+  let amount;
+  if (currentOrder.mode === 'buy') {
+    amount = currentOrder.buyPrice;
+    document.getElementById('order-price-label').textContent = `$${amount.toFixed(2)} / سنة`;
+  } else {
+    const dur = document.getElementById('rent-duration').value;
+    amount = (currentOrder.rentPrice * (RENT_MONTHS[dur]||1)).toFixed(2);
+    document.getElementById('order-price-label').textContent = `$${amount}`;
+  }
+}
+
+// ── Lemon Squeezy Checkout ────────────────────
+async function submitPayment() {
+  const btn   = document.getElementById('pay-btn');
+  const spin  = document.getElementById('pay-spinner');
+  const label = document.getElementById('pay-label');
+  btn.disabled = true;
+  spin.style.display = 'inline-block';
+  label.textContent  = 'جاري التحضير...';
+
+  try {
+    const duration = currentOrder.mode === 'rent'
+      ? document.getElementById('rent-duration').value : '1y';
+
+    const data = await apiFetch('/payments/create-checkout', {
+      method: 'POST',
+      body: JSON.stringify({
+        domain:   currentOrder.domain,
+        tld:      currentOrder.tld,
+        type:     currentOrder.mode,
+        duration,
+      }),
+    });
+
+    // وجّه العميل لصفحة الدفع على Lemon Squeezy
+    window.location.href = data.checkoutUrl;
+
+  } catch (e) {
+    showToast('❌ ' + e.message, 'error');
+    btn.disabled = false;
+    spin.style.display = 'none';
+    label.textContent  = '💳 انتقل للدفع';
+  }
+}
+
+// بعد الرجوع من صفحة الدفع، تحقق من نجاح العملية
+async function checkSuccessRedirect() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('success') === '1' && params.get('order')) {
+    // نظّف الـ URL
+    window.history.replaceState({}, '', '/');
+    showToast('🎉 تم الدفع بنجاح! جاري التفعيل...', 'success');
+    if (token) {
+      await restoreSession();
+      setTimeout(() => showPage('dashboard'), 1500);
+    }
+  }
+}
+
+// ── Dashboard / Orders ────────────────────────
+async function loadOrders() {
+  const container = document.getElementById('orders-container');
+  container.innerHTML = '<div class="loading">⏳ جاري تحميل الطلبات...</div>';
+  try {
+    const data = await apiFetch('/orders');
+    if (!data.orders.length) {
+      container.innerHTML = `<div class="empty-state"><div class="icon">📦</div><p>لا توجد طلبات بعد.</p><button class="btn-primary" style="margin-top:1rem" onclick="showPage('home')">ابحث عن نطاق</button></div>`;
+      return;
+    }
+    container.innerHTML = data.orders.map(o => {
+      const badge = o.status==='active'?'badge-active':o.status==='pending'?'badge-pending':'badge-failed';
+      const statusLabel = {active:'نشط',pending:'معلق',failed:'فشل',expired:'منتهي'}[o.status]||o.status;
+      const expiry = o.expiresAt ? new Date(o.expiresAt).toLocaleDateString('ar') : '—';
+      return `
+        <div class="order-card">
+          <div>
+            <div class="order-domain">${o.domain}</div>
+            <div class="order-meta">${o.type==='buy'?'شراء':'كراء'} · ${(o.amount/100).toFixed(2)} USD · ينتهي ${expiry}</div>
+          </div>
+          <span class="order-badge ${badge}">${statusLabel}</span>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = `<div style="color:var(--red);padding:2rem;text-align:center">${e.message}</div>`;
+  }
+}
+
+// ── Toast ─────────────────────────────────────
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// Close modals on overlay click
+document.getElementById('order-modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeOrderModal(); });
+document.getElementById('auth-modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeAuthModal(); });
+</script>
+</body>
+</html>
