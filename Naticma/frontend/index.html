@@ -404,8 +404,8 @@
     <p>© 2024 NaticMA — جميع الحقوق محفوظة</p>
     <div style="display:flex;gap:1.5rem">
      <a href="javascript:void(0)" onclick="showPage('privacy')">سياسة الخصوصية</a>
-      <a href="#">الشروط والأحكام</a>
-      <a href="#">اتصل بنا</a>
+      <a href="javascript:void(0)" onclick="showPage('terms')">الشروط والأحكام</a>
+      onclick="showPage('contact')"
     </div>
   </footer>
 </div>
@@ -421,7 +421,130 @@
         <h2 style="color:var(--text);margin-bottom:.5rem">حماية بياناتك</h2>
         <p>نحن في <strong>NaticMA</strong> نلتزم بحماية خصوصيتك. نجمع فقط المعلومات الضرورية لتشغيل الخدمة مثل البريد الإلكتروني وبيانات الدفع المؤمنة عبر Lemon Squeezy.</p>
       </div>
+      <div><div class="page" id="terms-page" style="display:none;">
+  <div style="max-width:800px;margin:0 auto;padding:4rem 2rem;direction:rtl">
+    
+    <button onclick="showPage('home')" style="background:none;border:1px solid var(--border);color:var(--muted);padding:.5rem 1rem;border-radius:8px;cursor:pointer;margin-bottom:2rem">
+      ← رجوع للرئيسية
+    </button>
+
+    <h1 style="color:var(--accent);margin-bottom:1rem">الشروط والأحكام</h1>
+    <p style="color:var(--muted);margin-bottom:2rem">آخر تحديث: مارس 2026</p>
+
+    <div style="color:var(--text);line-height:1.8;display:flex;flex-direction:column;gap:1.5rem">
+<div class="page" id="contact-page" style="display:none;">
+  <div style="max-width:800px;margin:0 auto;padding:4rem 2rem;direction:rtl">
+
+    <button onclick="showPage('home')" 
+    style="background:none;border:1px solid var(--border);color:var(--muted);
+    padding:.5rem 1rem;border-radius:8px;cursor:pointer;margin-bottom:2rem">
+    ← رجوع للرئيسية
+    </button>
+
+    <h1 style="color:var(--accent);margin-bottom:1rem">اتصل بنا</h1>
+
+    <p style="color:var(--muted);margin-bottom:2rem">
+      نحن هنا لمساعدتك في أي استفسار بخصوص خدماتنا عبر القنوات التالية:
+    </p>
+
+    <div style="color:var(--text);line-height:1.8;display:flex;flex-direction:column;gap:1.5rem">
+
+      <!-- Email -->
+      <div style="background:rgba(255,255,255,0.05);padding:1.5rem;border-radius:12px;border:1px solid var(--border)">
+        <h2 style="margin-bottom:.5rem;font-size:1.2rem">البريد الإلكتروني للدعم</h2>
+        <a href="mailto:support@naticma.com" style="color:var(--accent);text-decoration:none">
+          support@naticma.com
+        </a>
+      </div>
+
+      <!-- WhatsApp -->
+      <div style="background:rgba(255,255,255,0.05);padding:1.5rem;border-radius:12px;border:1px solid var(--border)">
+        <h2 style="margin-bottom:.5rem;font-size:1.2rem">رقم الهاتف / واتساب</h2>
+
+        <a href="https://wa.me/212775699406" target="_blank"
+        style="color:var(--accent);text-decoration:none;direction:ltr;display:inline-block">
+          +212 775 699 406
+        </a>
+
+        <p style="font-size:.85rem;color:var(--muted);margin-top:.5rem">
+          اضغط على الرقم لفتح محادثة مباشرة عبر واتساب
+        </p>
+      </div>
+
+      <!-- Working Hours -->
+      <div style="background:rgba(255,255,255,0.05);padding:1.5rem;border-radius:12px;border:1px solid var(--border)">
+        <h2 style="margin-bottom:.5rem;font-size:1.2rem">ساعات العمل</h2>
+        <p>
+          فريق الدعم متاح للرد على استفساراتكم من الاثنين إلى الجمعة  
+          من الساعة <b>9:00 صباحاً</b> حتى <b>6:00 مساءً</b>.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
       <div>
+        <h2>1. قبول الشروط</h2>
+        <p>
+          باستخدامك لمنصة <strong>NaticMA</strong> فإنك توافق على الالتزام بهذه الشروط والأحكام.
+          في حال عدم موافقتك على أي جزء منها، يرجى التوقف عن استخدام الموقع.
+        </p>
+      </div>
+
+      <div>
+        <h2>2. خدمات المنصة</h2>
+        <p>
+          تقدم منصة <strong>NaticMA</strong> خدمات البحث عن أسماء النطاقات
+          (Domain Names) وحجزها أو إدارتها عبر الإنترنت.
+        </p>
+      </div>
+
+      <div>
+        <h2>3. الدفع</h2>
+        <p>
+          تتم جميع عمليات الدفع بشكل آمن عبر مزود الدفع
+          <strong>Lemon Squeezy</strong>. نحن لا نقوم بتخزين
+          معلومات بطاقات الدفع الخاصة بالمستخدمين.
+        </p>
+      </div>
+
+      <div>
+        <h2>4. الاسترداد</h2>
+        <p>
+          نظراً لطبيعة خدمات النطاقات الرقمية، قد لا يكون الاسترداد
+          متاحاً بعد إتمام عملية الحجز أو الشراء، إلا في الحالات
+          التي يحددها مزود الدفع أو القوانين المعمول بها.
+        </p>
+      </div>
+
+      <div>
+        <h2>5. استخدام الخدمة</h2>
+        <p>
+          يلتزم المستخدم بعدم استخدام المنصة في أي نشاط غير قانوني
+          أو يضر بالمنصة أو بالمستخدمين الآخرين.
+        </p>
+      </div>
+
+      <div>
+        <h2>6. التعديلات</h2>
+        <p>
+          نحتفظ بالحق في تعديل هذه الشروط في أي وقت.
+          سيتم نشر أي تحديثات على هذه الصفحة.
+        </p>
+      </div>
+
+      <div>
+        <h2>7. التواصل</h2>
+        <p>
+          إذا كان لديك أي استفسار حول الشروط والأحكام،
+          يمكنك التواصل معنا عبر صفحة الاتصال في الموقع.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
         <h2 style="color:var(--text);margin-bottom:.5rem">تأمين البيانات</h2>
         <p>يتم تشفير جميع البيانات المنقولة عبر بروتوكولات حماية متطورة، ولا نقوم بمشاركة معلوماتك الشخصية مع أي طرف ثالث لأغراض تجارية.</p>
       </div>
@@ -710,6 +833,22 @@ function showToast(msg, type='success') {
 // Close modals on overlay click
 document.getElementById('order-modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeOrderModal(); });
 document.getElementById('auth-modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeAuthModal(); });
+  // دالة التنقل بين الصفحات لـ NaticMA
+function showPage(pageId) {
+  // إخفاء جميع الأقسام التي تحمل كلاس "page"
+  document.querySelectorAll('.page').forEach(page => {
+    page.style.display = 'none';
+  });
+
+  // إظهار القسم المطلوب فقط (مثل privacy-page أو terms-page)
+  const targetPage = document.getElementById(pageId + '-page');
+  if (targetPage) {
+    targetPage.style.display = 'block';
+    // العودة لأعلى الصفحة تلقائياً لرؤية المحتوى
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
 </script>
 </body>
 </html>
