@@ -403,11 +403,30 @@
     <div class="logo" style="font-family:'Space Mono',monospace;color:var(--accent)">NaticMA<span style="color:var(--accent2)">AR</span></div>
     <p>© 2024 NaticMA — جميع الحقوق محفوظة</p>
     <div style="display:flex;gap:1.5rem">
-      <a href="#">سياسة الخصوصية</a>
+     <a href="javascript:void(0)" onclick="showPage('privacy')">سياسة الخصوصية</a>
       <a href="#">الشروط والأحكام</a>
       <a href="#">اتصل بنا</a>
     </div>
   </footer>
+</div>
+<div class="page" id="privacy-page" style="display:none;">
+  <div style="max-width:800px;margin:0 auto;padding:4rem 2rem;direction:rtl">
+    <button onclick="showPage('home')" style="background:none;border:1px solid var(--border);color:var(--muted);padding:.5rem 1rem;border-radius:8px;cursor:pointer;margin-bottom:2rem">→ رجوع للرئيسية</button>
+    
+    <h1 style="color:var(--accent);margin-bottom:1rem">سياسة الخصوصية</h1>
+    <p style="color:var(--muted);margin-bottom:2rem">آخر تحديث: مارس 2026</p>
+
+    <div style="color:var(--text);line-height:1.8;display:flex;flex-direction:column;gap:1.5rem">
+      <div>
+        <h2 style="color:var(--text);margin-bottom:.5rem">حماية بياناتك</h2>
+        <p>نحن في <strong>NaticMA</strong> نلتزم بحماية خصوصيتك. نجمع فقط المعلومات الضرورية لتشغيل الخدمة مثل البريد الإلكتروني وبيانات الدفع المؤمنة عبر Lemon Squeezy.</p>
+      </div>
+      <div>
+        <h2 style="color:var(--text);margin-bottom:.5rem">تأمين البيانات</h2>
+        <p>يتم تشفير جميع البيانات المنقولة عبر بروتوكولات حماية متطورة، ولا نقوم بمشاركة معلوماتك الشخصية مع أي طرف ثالث لأغراض تجارية.</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════════════ DASHBOARD ═══════════════════════ -->
